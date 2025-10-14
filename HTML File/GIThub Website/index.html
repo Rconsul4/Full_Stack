@@ -13,6 +13,7 @@
       --card: #ffffff;
       --shadow: 0 10px 30px rgba(0,0,0,.08);
       --radius: 14px;
+      --sidebar-w: 180px;
     }
     body.dark {
       --brand: #7bb1ff;
@@ -27,142 +28,114 @@
       font-family: Arial, sans-serif;
       color: var(--ink);
       height: 100vh;
-      display: flex;
       background: linear-gradient(135deg, var(--bg1), var(--bg2));
-      overflow: hidden;
       transition: background 0.4s ease, color 0.4s ease;
     }
+
+    /* Always-visible sidebar */
+    .side-panel {
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--brand);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 24px 10px 30px;
+      z-index: 50;
+    }
+    .side-panel a {
+      color: #fff; text-decoration: none; font-weight: bold;
+      margin: 6px 0; opacity: .95;
+    }
+    .side-panel a:hover { text-decoration: underline; }
+
+    /* Content offset to the right of the sidebar */
     header {
-      position: absolute;
+      position: fixed;
       top: 0;
-      width: 100%;
-      background-color: var(--brand);
-      color: white;
-      padding: 20px 0;
+      left: var(--sidebar-w);
+      right: 0;
+      background: var(--brand);
+      color: #fff;
       text-align: center;
+      padding: 16px 0;
+      z-index: 40;
       box-shadow: 0 2px 10px rgba(0,0,0,.12);
       transition: background 0.4s ease;
     }
     main {
-      flex: 1;
-      padding: 120px 60px 60px;
-      text-align: center;
-      overflow-y: auto;
+      margin-left: var(--sidebar-w);
+      padding: 100px 20px 24px;
       display: grid;
       place-items: center;
+      height: 100vh;
+      overflow: auto;
     }
+
     .card {
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 40px;
-      max-width: 720px;
-      margin: 0 auto;
+      padding: 32px;
+      max-width: 760px;
+      width: min(760px, 92vw);
       transition: background 0.4s ease, box-shadow 0.4s ease;
+      text-align: center;
     }
     h2 { color: var(--brand); transition: color 0.4s ease; }
     .cta {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 10px 16px;
-      background: var(--brand);
-      color: #fff;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: transform .15s ease, opacity .15s ease;
+      display: inline-block; margin-top: 16px; padding: 10px 16px;
+      background: var(--brand); color: #fff; border-radius: 10px;
+      text-decoration: none; font-weight: bold;
     }
-    .cta:hover { transform: translateY(-1px); opacity: .95; }
-
-    /* Left sliding panel */
-    .side-panel {
-      position: fixed;
-      left: -160px;
-      top: 0;
-      width: 160px;
-      height: 100%;
-      background-color: var(--brand);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      padding-bottom: 30px;
-      transition: left 0.4s ease, background 0.4s ease;
-      z-index: 6;
-    }
-    .side-panel:hover { left: 0; }
-    .side-panel::after {
-      content: "☰";
-      position: absolute;
-      right: -35px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--brand);
-      color: white;
-      font-size: 22px;
-      border-radius: 0 6px 6px 0;
-      padding: 8px 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.25);
-      transition: background 0.4s ease;
-    }
-    .side-panel a {
-      color: white; text-decoration: none; margin: 10px 0;
-      font-size: 16px; font-weight: bold; opacity:.95;
-      transition: transform .2s ease;
-    }
-    .side-panel a:hover { transform: scale(1.05); text-decoration: underline; }
 
     /* Theme toggle */
     .theme-toggle {
       position: fixed;
-      top: 18px;
-      right: 24px;
-      background: transparent;
-      border: none;
-      color: #fff;
-      font-size: 22px;
-      cursor: pointer;
-      z-index: 10;
-      transition: transform 0.3s ease;
+      top: 16px; right: 16px;
+      background: transparent; border: none; color: #fff;
+      font-size: 22px; cursor: pointer; z-index: 60;
     }
-    .theme-toggle:hover { transform: scale(1.2); }
   </style>
 </head>
 <body>
 
-  <div class="side-panel">
+  <!-- Sidebar (always visible) -->
+  <nav class="side-panel">
+    <a href="index.html">Home</a>
     <a href="about.html">About Me</a>
     <a href="dashboards.html">Dashboard Samples</a>
     <a href="contact.html">Contact</a>
-  </div>
+  </nav>
 
-  <button class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark">🌙</button>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" title="Toggle Light/Dark">🌙</button>
 
-  <header>
-    <h1>Rayan Bashawri's Website</h1>
-  </header>
+  <header><h1>Rayan Bashawri's Website</h1></header>
 
   <main>
     <section class="card">
       <h2>Welcome</h2>
-      <p>Hover on the left edge to open the sliding panel. Explore my background, dashboards, and contact info.</p>
+      <p>Use the left menu to navigate. Toggle light/dark mode anytime.</p>
       <a class="cta" href="dashboards.html">View Dashboard Samples →</a>
     </section>
   </main>
 
   <script>
-    const toggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    toggle.addEventListener('click', () => {
-      body.classList.toggle('dark');
-      toggle.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
-      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
-    });
+    // Theme toggle + memory
+    const themeToggle = document.getElementById('themeToggle');
     if (localStorage.getItem('theme') === 'dark') {
-      body.classList.add('dark');
-      toggle.textContent = '☀️';
+      document.body.classList.add('dark'); themeToggle.textContent = '☀️';
     }
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      themeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
   </script>
 </body>
 </html>
