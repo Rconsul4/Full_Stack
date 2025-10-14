@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Samples – Rayan Bashawri</title>
+  <style>
+    :root {
+      --brand: #1a4f8b;
+      --ink: #333;
+      --bg1: #f7fbff;
+      --bg2: #eef3f8;
+      --card: #ffffff;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --radius: 14px;
+      --overlay: rgba(0,0,0,.6);
+    }
+    body.dark {
+      --brand: #7bb1ff;
+      --ink: #f4f4f4;
+      --bg1: #121212;
+      --bg2: #1b1b1b;
+      --card: #232323;
+      --shadow: 0 8px 20px rgba(0,0,0,.6);
+      --overlay: rgba(0,0,0,.7);
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      height: 100vh;
+      display: flex;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow: hidden;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--brand);
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+      z-index: 5;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12);
+    }
+    main {
+      flex: 1;
+      padding: 120px 24px 24px;
+      overflow: auto;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    select, button {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #cfd6de;
+      font-family: inherit;
+    }
+    button.view-btn {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.view-btn:hover { opacity: .95; }
+
+    /* Grid of sample cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .4s ease;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,.1); }
+    .thumb {
+      aspect-ratio: 16/10;
+      width: 100%;
+      object-fit: cover;
+      display: block;
+      background: #e6edf5;
+    }
+    .card .title {
+      padding: 10px 12px;
+      font-weight: bold;
+    }
+
+    /* Sliding Left Panel */
+    .side-panel {
+      position: fixed;
+      left: -160px;
+      top: 0;
+      width: 160px;
+      height: 100%;
+      background-color: var(--brand);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 30px;
+      transition: left 0.4s ease, background 0.4s ease;
+      z-index: 6;
+    }
+    .side-panel:hover { left: 0; }
+    .side-panel::after {
+      content: "☰";
+      position: absolute;
+      right: -35px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--brand);
+      color: white;
+      font-size: 22px;
+      border-radius: 0 6px 6px 0;
+      padding: 8px 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+    .side-panel a {
+      color: white; text-decoration: none; margin: 10px 0;
+      font-size: 16px; font-weight: bold; opacity:.95;
+      transition: transform .2s ease;
+    }
+    .side-panel a:hover { transform: scale(1.05); text-decoration: underline; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.3s ease;
+    }
+    .theme-toggle:hover { transform: scale(1.2); }
+
+    /* Modal */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--overlay);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease;
+      z-index: 20;
+    }
+    .overlay.show { opacity: 1; visibility: visible; }
+    .modal {
+      position: fixed;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(.98);
+      width: min(95vw, 1100px);
+      max-height: 90vh;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 10px;
+      opacity: 0; visibility: hidden;
+      transition: opacity .25s ease, visibility .25s ease, transform .25s ease, background .4s ease;
+      z-index: 21;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .modal.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 8px 0 8px;
+    }
+    .modal-title { font-weight: bold; color: var(--ink); }
+    .close-x {
+      background: transparent; border: none; font-size: 22px; cursor: pointer; color: var(--ink);
+    }
+    .modal-body {
+      overflow: auto; padding: 6px; border-radius: 8px;
+      display: grid; place-items: center;
+    }
+    .modal-body img {
+      width: 100%; height: auto; border-radius: 8px;
+    }
+    .modal-actions {
+      display: flex; justify-content: flex-end; gap: 8px; padding: 0 8px 4px;
+    }
+    .btn {
+      padding: 8px 12px; border-radius: 8px; border: 1px solid var(--brand);
+      background: var(--brand); color: #fff; cursor: pointer; text-decoration: none; font-weight: bold;
+    }
+    .btn.secondary {
+      background: transparent; color: var(--brand);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left Panel -->
+  <div class="side-panel">
+    <a href="index.html">Home</a>
+    <a href="about.html">About Me</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark">🌙</button>
+
+  <header>
+    <h1>Dashboard Samples</h1>
+  </header>
+
+  <main>
+    <!-- Toolbar: select a dashboard & view -->
+    <div class="toolbar">
+      <label for="dashSelect"><strong>Select Dashboard:</strong></label>
+      <select id="dashSelect"></select>
+      <button class="view-btn" id="viewBtn">View</button>
+    </div>
+
+    <!-- Auto-generated grid of cards -->
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <!-- Modal viewer -->
+  <div class="overlay" id="overlay"></div>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Dashboard</div>
+      <button class="close-x" id="closeX" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <img id="modalImg" alt="Dashboard preview">
+    </div>
+    <div class="modal-actions">
+      <a class="btn secondary" id="openNewTab" target="_blank" rel="noopener">Open Full Size</a>
+      <button class="btn" id="closeBtn">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // 1) Theme toggle with memory
+    const toggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    toggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      toggle.textContent = body.classList.contains('dark') ? '☀️' : '🌙';
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
+      toggle.textContent = '☀️';
+    }
+
+    // 2) DASHBOARD LIST
+    const DASHBOARDS = [
+      { name: "Price Mix Overview", file: "images/Price_mix_overview.png" },
+      { name: "Price Mix Detail", file: "images/Price_mix_Detail.png" },
+      { name: "Sales Performance – 2025", file: "images/sales_performance_2025.png" },
+      { name: "Store Item Monitoring", file: "images/Store_Item_monitoring.png" }
+    ];
+
+    // 3) Build dropdown + grid
+    const select = document.getElementById('dashSelect');
+    const grid = document.getElementById('grid');
+    DASHBOARDS.forEach((d, i) => {
+      // dropdown option
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = d.name;
+      select.appendChild(opt);
+
+      // grid card
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.title = d.name;
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.alt = d.name + " thumbnail";
+      img.src = d.file;
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = d.name;
+      card.appendChild(img);
+      card.appendChild(title);
+      card.addEventListener('click', () => openModal(d));
+      grid.appendChild(card);
+    });
+
+    // 4) Modal logic
+    const overlay = document.getElementById('overlay');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modalImg');
+    const modalTitle = document.getElementById('modalTitle');
+    const closeX = document.getElementById('closeX');
+    const closeBtn = document.getElementById('closeBtn');
+    const openNewTab = document.getElementById('openNewTab');
+    const viewBtn = document.getElementById('viewBtn');
+
+    function openModal(d) {
+      modalTitle.textContent = d.name;
+      modalImg.src = d.file;
+      openNewTab.href = d.file;
+      overlay.classList.add('show');
+      modal.classList.add('show');
+    }
+    function closeModal() {
+      overlay.classList.remove('show');
+      modal.classList.remove('show');
+    }
+    overlay.addEventListener('click', closeModal);
+    closeX.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    // "View" button uses currently-selected dashboard
+    viewBtn.addEventListener('click', () => {
+      const idx = +select.value;
+      if (!isNaN(idx)) openModal(DASHBOARDS[idx]);
+    });
+  </script>
+</body>
+</html>
